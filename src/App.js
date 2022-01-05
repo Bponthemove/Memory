@@ -5,7 +5,9 @@ import './App.css'
 
 function App() {
 
-    const [allCards, setAllCards] = useState(['cha1', 'chi2', 'dog3', 'fox4', 'pea5', 'rob6', 'sea7', 'sna8', 'cha9', 'chi10', 'dog11', 'fox12', 'pea13', 'rob14', 'sea15', 'sna16'])
+    const [allCards, setAllCards] = useState(
+        ['cha1', 'chi2', 'dog3', 'fox4', 'pea5', 'rob6', 'sea7', 'sna8', 'cha9', 'chi10', 'dog11', 'fox12', 'pea13', 'rob14', 'sea15', 'sna16']
+    )
     const [counterPlayer1, setCounterPlayer1] = useState(0)
     const [counterPlayer2, setCounterPlayer2] = useState(0)
     const [player1Turn, setPlayer1Turn] = useState(false)
@@ -16,7 +18,7 @@ function App() {
     const [turnedCards, setTurnedCards] = useState(0)
     const [winner, setWinner] = useState(false)
     const [draw, setDraw] = useState(false)
-    const firstLoad = useRef(false)
+    const firstLoad = useRef(true)
     const [point, setPoint] = useState(false)
 
     useEffect(() => {
@@ -25,7 +27,7 @@ function App() {
                 setPoint(prev => !prev)
             }, 2000)
         }
-        if (firstLoad.current) {
+        if (!firstLoad.current) {
             setPoint(prev => !prev)
             pointAdded()
         }
@@ -59,46 +61,47 @@ function App() {
 
     useEffect(() => {
         //check for a winner
-        let reset =  () => {
-            setTimeout(() => {
-                setPlayer1Turn(false)
-                setPlayer2Turn(false)
-                setAllCardsHidden(true)
-                setShowCard([])
-                setOpenCards([])
-            }, 3000)
-        }
-        if (counterPlayer1 === 5 || counterPlayer2 === 5 || 
-            (counterPlayer1 === 4 && counterPlayer2 === 3 && player1Turn) || 
-            (counterPlayer2 === 4 && counterPlayer1 === 3 && player2Turn)) {
-            setWinner(true)
-            reset()
-        }
-        if (counterPlayer1 === 4 & counterPlayer1 === counterPlayer2) {
-            setDraw(true)
-            player1Turn ? setPlayer2Turn(true) : setPlayer1Turn(true)
-            reset()
-        }
-        return () => clearTimeout(reset)
+            if (!firstLoad.current) {
+            let reset =  () => {
+                setTimeout(() => {
+                    if (player1Turn) setPlayer1Turn(prev => !prev)
+                    if (player2Turn) setPlayer2Turn(prev => !prev) 
+                    setOpenCards([])
+                }, 3000)
+            }
+            if (counterPlayer1 === 5 || counterPlayer2 === 5 || 
+                (counterPlayer1 === 4 && counterPlayer2 === 3 && player1Turn) || 
+                (counterPlayer2 === 4 && counterPlayer1 === 3 && player2Turn)) {
+                setWinner(true)
+                reset()
+            }
+            if (counterPlayer1 === 4 & counterPlayer1 === counterPlayer2) {
+                setDraw(true)
+                player1Turn ? setPlayer2Turn(true) : setPlayer1Turn(true)
+                reset()
+            }
+            return () => clearTimeout(reset)
+            }
     }, [counterPlayer1, counterPlayer2])
     
     
     useEffect(() => {
-        //decide who is who after shuffle
-        if (firstLoad.current) {
+        //decide who is who after shuffle or set firstLoad to true after first render
+        if (!firstLoad.current) {
             whoIsFirst()
         } else {
-            firstLoad.current = true
+            firstLoad.current = false
         }
     }, [allCards])
     
     
     const shuffleHandle = () => {
+        if (showCard.length !== 0) setShowCard([])
+        if (winner) setWinner(prev => !prev)
+        if (draw) setDraw(prev => !prev)
+        if (counterPlayer1 !== 0) setCounterPlayer1(0)
+        if (counterPlayer2 !== 0) setCounterPlayer2(0)
         if (!allCardsHidden) setAllCardsHidden(true)
-        setWinner(false)
-        setDraw(false)
-        setCounterPlayer1(0)
-        setCounterPlayer2(0)
         shuffleGrid()
     }
 
@@ -163,8 +166,7 @@ function App() {
             </div>
             <div id="card-area">
                 <Tile   allCards={allCards} allCardsHidden={allCardsHidden} showCard={showCard} turn={turn}
-                        player1Turn={player1Turn} player2Turn={player2Turn} turnedCards={turnedCards} winner={winner}
-                        draw={draw} point={point} openCards={openCards}
+                        winner={winner} draw={draw} openCards={openCards}
                 />
             </div>
             <footer id="footer">Bambam 2021</footer>

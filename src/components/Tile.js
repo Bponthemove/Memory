@@ -1,10 +1,10 @@
 import React from 'react'
 import data from '../data'
 
-const Tile = ( {allCards, allCardsHidden, showCard, player1Turn, player2Turn, turnedCards, turn, winner, draw, openCards} ) => {
-    return allCards.map(card => {
+const Tile = ( {allCards, allCardsHidden, showCard, turn, winner, draw, openCards} ) => {
+    return allCards.map((card, index) => {
         return (
-            <div className='card-container'> 
+            <div className='card-container' key={index}> 
                 <div className={allCardsHidden && !showCard.find(x => x === card) ? 'card' : 'card flip'}>
                     <div    id={card} 
                             className={openCards.find(x => x === card) ? "card-face-front card-face point" : "card-face-front card-face"}
