@@ -64,8 +64,8 @@ function App() {
             if (!firstLoad.current) {
             let reset =  () => {
                 setTimeout(() => {
-                    if (player1Turn) setPlayer1Turn(prev => !prev)
-                    if (player2Turn) setPlayer2Turn(prev => !prev) 
+                    setPlayer1Turn(false)
+                    setPlayer2Turn(false)
                     setOpenCards([])
                 }, 3000)
             }
